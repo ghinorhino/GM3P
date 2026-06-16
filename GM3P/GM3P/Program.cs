@@ -22,7 +22,7 @@ namespace GM3P
 
         static async Task Main(string[] args)
         {
-            Console.WriteLine($"GM3P v{Version}.0");
+            Console.WriteLine($"GM3P v{Version}.1");
 
             // Setup services manually (no DI container)
             SetupServices();
@@ -152,7 +152,12 @@ namespace GM3P
                         Console.WriteLine("Usage: GM3P.exe config update c.[setting] [Value] save? [configPath?]");
                         return;
                     }
-                    
+
+                    if (File.Exists(savePath))
+                    {
+                        _config.LoadConfiguration(savePath);
+                        Console.WriteLine($"Configuration loaded from {savePath}");
+                    }
                     var setting = args[2];
                     var value = args[3];
                     switch (setting)
@@ -177,6 +182,9 @@ namespace GM3P
                             break;
                         case "c.chapteramount":
                             _config.UpdateConfiguration(c => c.ChapterAmount = int.Parse(value));
+                            break;
+                        case "c.combined":
+                            _config.UpdateConfiguration(c => c.Combined = bool.Parse(value));
                             break;
                         case "c.enablefastcombiner":
                             _config.UpdateConfiguration(c => c.EnableFastCombiner = bool.Parse(value));
@@ -454,6 +462,7 @@ namespace GM3P
                     Console.WriteLine("  c.gameengine           - Game engine type (e.g. GM for GameMaker). Currently unused");
                     Console.WriteLine("  c.modamount            - Number of mods to patch/compare");
                     Console.WriteLine("  c.chapteramount        - Number of chapters to patch. Default: 1)");
+                    Console.WriteLine("  c.combined            - Whether mods were combined (true/false). Default: false");
                     Console.WriteLine("  c.enablefastcombiner   - Whether to enable fast combiner (true/false), must be false for room combining. Default: true");
                     Console.WriteLine("  c.cacheenabled         - Whether to enable export cache (true/false). Default: true");
                     Console.WriteLine("  c.cachespritesenabled - Whether to cache sprites in export cache (true/false). Default: true");
